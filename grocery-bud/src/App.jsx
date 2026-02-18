@@ -1,5 +1,5 @@
 import Items from "./components/Items";
-import { groceryItems } from "./data/groceryItems";
+// import { groceryItems } from "./data/groceryItems";
 import { useEffect, useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,8 +7,22 @@ import { nanoid } from "nanoid";
 import Form from "./components/Form";
 import "./App.css";
 
+const getLocalStorage = () => {
+  let list = localStorage.getItem("grocery-list");
+  if (list) {
+    return JSON.parse(list);
+  }
+  return [];
+};
+
+const setLocalStorage = (items) => {
+  localStorage.setItem("grocery-list", JSON.stringify(items));
+};
+
+const initialList = getLocalStorage();
+
 const App = () => {
-  const [items, setItems] = useState(groceryItems);
+  const [items, setItems] = useState(initialList);
   const [editId, setEditId] = useState(null);
   const inputRef = useRef(null);
 
@@ -25,12 +39,14 @@ const App = () => {
       }
       return item;
     });
+    setLocalStorage(newItems);
     setItems(newItems);
   };
 
   const removeItem = (itemId) => {
     const newItems = items.filter((item) => item.id !== itemId);
     setItems(newItems);
+    setLocalStorage(newItems);
     toast.success("item deleted");
   };
 
@@ -42,6 +58,7 @@ const App = () => {
     };
     const newItems = [...items, newItem];
     setItems(newItems);
+    setLocalStorage(newItems);
     toast.success("grocery item added");
   };
 
@@ -54,6 +71,7 @@ const App = () => {
     });
     setItems(newItems);
     setEditId(null);
+    setLocalStorage(newItems);
     toast.success("item updated");
   };
 
